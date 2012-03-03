@@ -30,4 +30,9 @@ class Cerubis::ContextTest < MiniTest::Unit::TestCase
     context = Cerubis::Context.new
     assert_equal 'foo', context.get("'foo'")
   end
+
+  def test_context_returns_object_method_values
+    context = Cerubis::Context.new(StubObject.new(:foo => 'bar'))
+    assert_equal 'bar', context.get('foo')
+  end
 end

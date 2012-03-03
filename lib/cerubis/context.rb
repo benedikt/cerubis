@@ -1,8 +1,13 @@
 class Cerubis
   class Context < Hash
-    def initialize(hash={})
+    def initialize(object = {})
       super(nil)
-      hash.each { |key, value| self[key] = value }
+
+      if object.kind_of?(Hash)
+        replace(object) 
+      else
+        @object = object
+      end
     end
 
     def get(key)
@@ -14,7 +19,7 @@ class Cerubis
         when /^'.*'$/ then key[1..-2]
         else
           object_methods = key.split('.')
-          object = self[object_methods.shift.to_sym]
+          object = @object || self[object_methods.shift.to_sym]
           while meth = object_methods.shift do
             if object.respond_to?(:cerubis_respond_to?) && object.cerubis_respond_to?(meth.to_sym)
               object = object.send(meth)
