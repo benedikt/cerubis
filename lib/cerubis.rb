@@ -18,12 +18,12 @@ class Cerubis
   autoload :SyntaxError, 'cerubis/syntax_error'
 
   def self.register_block(name, klass)
-    blocks[name] = klass
+    blocks[name.to_sym] = klass
   end
 
   def self.register_helper(*mods)
     mod = mods.pop
-    mods.each { |key| helpers[key] = mod }
+    mods.each { |key| helpers[key.to_sym] = mod }
   end
 
   def self.blocks

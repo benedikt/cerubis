@@ -54,6 +54,12 @@ class RenderedTest < MiniTest::Unit::TestCase
     assert_equal '<p>** Item Value **</p>', template.to_html.strip
   end
 
+  def test_render_bar_helper
+    Cerubis.register_helper :bar_helper, BarHelper
+    template = Cerubis.render(bar_helper_content, {})
+    assert_equal '<p>:: bar ::</p>', template.to_html.strip
+  end
+
   def test_helper_syntax_error
     assert_raises Cerubis::SyntaxError do
       Cerubis.register_helper :foo_helper, FooHelper
@@ -139,6 +145,12 @@ class RenderedTest < MiniTest::Unit::TestCase
       STR
     end
 
+    def bar_helper_content
+      <<-STR
+        <p>{{ bar_helper }}</p>
+      STR
+    end
+
     def helper_content_error
       <<-STR
       {{ foo_helper 'bar', 'baz' }}
@@ -154,6 +166,12 @@ class RenderedTest < MiniTest::Unit::TestCase
     module FooHelper
       def foo_helper(value)
         "** #{value} **"
+      end
+    end
+
+    module BarHelper
+      def bar_helper
+        ":: bar ::"
       end
     end
 end

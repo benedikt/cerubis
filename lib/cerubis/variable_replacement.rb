@@ -9,26 +9,26 @@ class Cerubis
             ctx.get(arg.strip)
           end
 
-          begin
-            if helper_mod = Cerubis.helpers[helper_method.to_sym] || Cerubis.helpers[helper_method]
-              helper = Helper.new(ctx)
-              helper.extend helper_mod
-
-              if has_public_method?(helper, helper_method)
-                helper.send(helper_method, *helper_args)
-              end
-            end
-          rescue ArgumentError
-            raise SyntaxError, "A wrong number of arguments were passed to '#{helper_method}'"
-          end
+          call_helper(helper_method, helper_args, ctx)
         else
-          ctx.get(match_var)
+          call_helper(match_var, [], ctx) || ctx.get(match_var)
         end
       end
     end
 
-    def has_public_method?(obj, meth)
-      obj.public_methods.include?(meth) || obj.public_methods.include?(meth.to_sym)
+  private
+
+    def call_helper(name, arguments = [], ctx = context)
+      if helper_mod = Cerubis.helpers[name.to_sym]
+        helper = Helper.new(ctx)
+        helper.extend helper_mod
+
+        if helper.respond_to?(name)
+          helper.send(name, *arguments)
+        end
+      end
+    rescue ArgumentError
+      raise SyntaxError, "A wrong number of arguments were passed to '#{name}'"
     end
   end
 end
